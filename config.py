@@ -13,11 +13,17 @@ SENT_CSV = DATA_DIR / "sent_outreach.csv"
 
 # Search / crawl
 CRAWL_LIMIT = int(os.getenv("CRAWL_LIMIT", "20"))
+# Queries tuned for SEA villa/property management with contact info
 SEARCH_QUERIES = [
     "villa property management Southeast Asia WhatsApp",
     "villa management company Thailand Bali Indonesia WhatsApp",
     "luxury villa management Singapore Malaysia contact",
+    "villa management Bali phone number contact",
+    "villa rental Thailand contact number",
+    "property management Phuket Seminyak WhatsApp",
 ]
+# DuckDuckGo region: id-id (Indonesia), th-th (Thailand), sg-en (Singapore), wt-wt (no region)
+SEARCH_REGION = os.getenv("SEARCH_REGION", "wt-wt")
 
 # Twilio WhatsApp (optional)
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "")

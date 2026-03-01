@@ -94,6 +94,13 @@ The default outreach text is in `outreach.py` as `OUTREACH_TEMPLATE`. It uses `[
 - **Rate limiting** – The script sends at most `--max-send` per run and waits 2 seconds between Twilio sends to reduce risk of blocks.
 - **Data** – You are responsible for handling personal data (phone numbers, names) in line with GDPR and local privacy laws.
 
+## Troubleshooting: "Found 0 new phone contacts"
+
+- **Install the search dependency** – Ensure `duckduckgo-search` is installed: `pip install duckduckgo-search`. Without it, search returns no results.
+- **Use SerpAPI for reliable search** – DuckDuckGo can return 0 results (rate limiting or region). Add `SERPAPI_KEY` to `.env` (get a key at [serpapi.com](https://serpapi.com/)); the crawler will use both DuckDuckGo and SerpAPI.
+- **Bias results to Southeast Asia** – In `.env` set `SEARCH_REGION=id-id` (Indonesia) or `SEARCH_REGION=th-th` (Thailand). Default is `wt-wt` (no region).
+- **Run with verbose output** – The crawler prints how many results each query returns and when it finds phones in snippets vs. pages. If you see "0 results" for every query, fix the above.
+
 ## Customization
 
 - **Search queries** – Edit `SEARCH_QUERIES` in `config.py`.

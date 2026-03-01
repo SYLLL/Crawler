@@ -83,6 +83,10 @@ def send_whatsapp(lead: Lead) -> bool:
         return False
     try:
         from twilio.rest import Client
+    except ImportError:
+        print("Twilio not installed. Run: pip install twilio")
+        return False
+    try:
         client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
         to = lead.phone
         if not to.startswith("+"):

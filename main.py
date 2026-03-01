@@ -24,6 +24,8 @@ def run_crawler_only() -> list[Lead]:
     print(f"Found {len(leads)} new phone contacts.")
     if leads:
         append_leads(leads)
+    elif not leads:
+        print("Tip: Add SERPAPI_KEY to .env for more reliable search (see README).")
     return leads
 
 
