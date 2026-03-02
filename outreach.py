@@ -7,7 +7,7 @@ from pathlib import Path
 from config import LEADS_CSV, SENT_CSV, TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_FROM, DATA_DIR
 from crawler import Lead
 
-OUTREACH_TEMPLATE = """Hi [Name], I'm Lia, a Stanford grad running a research project on professional cleaning. We're looking for cleaning companies to partner with. Your cleaners wear a small body camera during their normal work and we capture the process. They get paid extra per session, your company gets a location fee and a free professional video of your team's work. All equipment and waivers handled by us. Would you be open to a quick call?"""
+OUTREACH_TEMPLATE = """Hi [Name], I'm Lia, a Stanford grad running a research project on professional cleaning. We're looking for villa with property management services to partner with. Your cleaners wear a small body camera during their normal work and we capture the process. They get paid extra per session, your company gets a location fee and a free professional video of your team's work. All equipment and waivers handled by us. Would you be open to a quick call?"""
 
 
 def format_message(lead: Lead) -> str:
@@ -105,7 +105,7 @@ def send_whatsapp(lead: Lead) -> bool:
         return False
 
 
-def get_pending_leads_from_csv(max_count: int = 50) -> list[Lead]:
+def get_pending_leads_from_csv(max_count: int = 200) -> list[Lead]:
     """Load leads from CSV that we haven't sent to yet."""
     if not LEADS_CSV.exists():
         return []

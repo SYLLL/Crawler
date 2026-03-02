@@ -12,7 +12,7 @@ LEADS_CSV = DATA_DIR / "leads.csv"
 SENT_CSV = DATA_DIR / "sent_outreach.csv"
 
 # Search / crawl
-CRAWL_LIMIT = int(os.getenv("CRAWL_LIMIT", "20"))
+CRAWL_LIMIT = int(os.getenv("CRAWL_LIMIT", "100"))
 # Queries tuned for SEA villa/property management with contact info
 SEARCH_QUERIES = [
     "villa property management Southeast Asia WhatsApp",

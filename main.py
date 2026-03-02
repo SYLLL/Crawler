@@ -29,7 +29,7 @@ def run_crawler_only() -> list[Lead]:
     return leads
 
 
-def run_outreach_only(max_send: int = 10, dry_run: bool = False):
+def run_outreach_only(max_send: int = 100, dry_run: bool = False):
     """Send outreach to up to max_send pending leads. If dry_run, only print messages."""
     pending = get_pending_leads_from_csv(max_count=max_send)
     if not pending:
@@ -59,7 +59,7 @@ def main():
     parser.add_argument("--crawl-only", action="store_true", help="Only run crawler, do not send messages")
     parser.add_argument("--send-only", action="store_true", help="Only send to pending leads (no crawl)")
     parser.add_argument("--dry-run", action="store_true", help="Print messages only, do not send")
-    parser.add_argument("--max-send", type=int, default=10, help="Max outreach messages per run (default 10)")
+    parser.add_argument("--max-send", type=int, default=200, help="Max outreach messages per run (default 200)")
     args = parser.parse_args()
 
     if args.send_only:
