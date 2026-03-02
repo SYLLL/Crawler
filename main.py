@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
 Daily crawler: find Southeast Asia villa property management WhatsApp contacts,
-save to CSV, and optionally send outreach via Twilio WhatsApp.
+save to CSV, and optionally send outreach via Twilio or WhatsApp Web (your number).
 """
 import argparse
 import time
 
-from config import TWILIO_ACCOUNT_SID
+from config import SEND_METHOD, TWILIO_ACCOUNT_SID
 from crawler import run_crawl, Lead
 from outreach import (
     append_leads,
@@ -35,12 +35,17 @@ def run_outreach_only(max_send: int = 10, dry_run: bool = False):
     if not pending:
         print("No pending leads to contact.")
         return
-    print(f"{'[DRY RUN] ' if dry_run else ''}Sending to {len(pending)} lead(s)...")
+    print(f"{'[DRY RUN] ' if dry_run else ''}Sending to {len(pending)} lead(s) via {SEND_METHOD}...")
+    if dry_run:
+        for lead in pending:
+            print(f"To {lead.phone} ({lead.name}):\n{format_message(lead)}\n")
+        return
+    if SEND_METHOD == "whatsapp_web":
+        from whatsapp_web_sender import send_bulk_via_whatsapp_web
+        n = send_bulk_via_whatsapp_web(pending, on_sent=record_sent)
+        print(f"Sent {n} message(s) via WhatsApp Web.")
+        return
     for lead in pending:
-        msg = format_message(lead)
-        if dry_run:
-            print(f"To {lead.phone} ({lead.name}):\n{msg}\n")
-            continue
         if send_whatsapp(lead):
             record_sent(lead)
             print(f"Sent to {lead.phone}")
@@ -64,10 +69,10 @@ def main():
     run_crawler_only()
 
     if not args.crawl_only and not args.dry_run:
-        if TWILIO_ACCOUNT_SID:
+        if SEND_METHOD == "whatsapp_web" or TWILIO_ACCOUNT_SID:
             run_outreach_only(max_send=args.max_send, dry_run=False)
         else:
-            print("Twilio not configured. Add TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN to send messages.")
+            print("Set SEND_METHOD=whatsapp_web in .env (default), or add Twilio credentials for SEND_METHOD=twilio.")
     elif args.dry_run:
         run_outreach_only(max_send=args.max_send, dry_run=True)
 

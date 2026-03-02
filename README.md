@@ -7,7 +7,7 @@ Daily crawler that finds WhatsApp-capable phone contacts for **villa property ma
 1. **Search** – Runs web search for queries like “villa property management Southeast Asia WhatsApp”, “villa management Thailand Bali Indonesia WhatsApp”, etc.
 2. **Crawl** – Visits result URLs and extracts phone numbers (and page titles as names). Phone numbers work with WhatsApp.
 3. **Store** – Appends new, deduplicated leads to `data/leads.csv`.
-4. **Outreach** (optional) – Sends the template message via **Twilio WhatsApp** to pending leads, and records sent numbers in `data/sent_outreach.csv` so each contact is only messaged once.
+4. **Outreach** (optional) – Sends the template message to pending leads and records them in `data/sent_outreach.csv`. You can send from **your own WhatsApp number** (WhatsApp Web) or via **Twilio** (Business API).
 
 ## Setup
 
@@ -20,6 +20,8 @@ source venv/bin/activate   # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
+You need **Chrome** installed for the WhatsApp Web sender (default).
+
 ### 2. Environment variables
 
 Copy the example env file and edit as needed:
@@ -29,18 +31,16 @@ cp .env.example .env
 ```
 
 - **Crawl only (no sending)**  
-  Leave `TWILIO_*` empty. The script will only collect leads into `data/leads.csv`.
+  Use `--crawl-only` or leave sending disabled.
 
 - **Optional: SerpAPI**  
   Set `SERPAPI_KEY` in `.env` for more search results (get a key at [serpapi.com](https://serpapi.com/)).
 
-- **Sending WhatsApp**  
-  Set Twilio WhatsApp credentials in `.env`:
-  - `TWILIO_ACCOUNT_SID`
-  - `TWILIO_AUTH_TOKEN`
-  - `TWILIO_WHATSAPP_FROM` (e.g. `whatsapp:+14155238886` for Twilio sandbox)
+- **Sending WhatsApp (default: your own number)**  
+  Set `SEND_METHOD=whatsapp_web` in `.env` (this is the default). When you run send (e.g. `python main.py --send-only`), a Chrome window opens with **WhatsApp Web**. The first time, **scan the QR code** with WhatsApp on your phone (WhatsApp → Settings → Linked Devices → Link a Device). After that, your session is saved in `data/whatsapp_web_profile/` and you won’t need to scan again. Messages are sent from **your own number**. No Twilio or Business API needed.
 
-  See [Twilio WhatsApp](https://www.twilio.com/docs/whatsapp) for setup. **Cold outreach** usually requires an approved **message template** in the WhatsApp Business API; the script sends the template as a text body—you may need to create and use an approved template name in production.
+- **Alternative: Twilio**  
+  Set `SEND_METHOD=twilio` and add `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_WHATSAPP_FROM` in `.env`. The Twilio number must be enabled for WhatsApp (Sandbox or approved Business API). See [Twilio WhatsApp](https://www.twilio.com/docs/whatsapp). If you see errors like "From number not valid" or 63112, use `SEND_METHOD=whatsapp_web` instead.
 
 ### 3. Message template
 
@@ -48,8 +48,9 @@ The default outreach text is in `outreach.py` as `OUTREACH_TEMPLATE`. It uses `[
 
 ## Usage
 
-- **Full run (crawl + send, if Twilio configured)**  
-  `python main.py`
+- **Full run (crawl + send)**  
+  `python main.py`  
+  Uses WhatsApp Web by default (scan QR once); or Twilio if `SEND_METHOD=twilio` and credentials are set.
 
 - **Crawl only (no WhatsApp send)**  
   `python main.py --crawl-only`
@@ -62,6 +63,10 @@ The default outreach text is in `outreach.py` as `OUTREACH_TEMPLATE`. It uses `[
 
 - **Limit number of messages per run**  
   `python main.py --max-send 5`
+
+- **Send one test message (WhatsApp Web)**  
+  `python send_test_whatsapp_web.py +1XXXXXXXXXX`  
+  Opens Chrome, loads WhatsApp Web (scan QR if first time), and sends the template once to that number.
 
 ### Daily run
 
@@ -91,7 +96,7 @@ The default outreach text is in `outreach.py` as `OUTREACH_TEMPLATE`. It uses `[
 ## Compliance and best practices
 
 - **WhatsApp policies** – Sending to users who haven’t opted in can violate WhatsApp’s terms. Use the WhatsApp Business API with **approved templates** for first-time outreach and follow Meta’s policies.
-- **Rate limiting** – The script sends at most `--max-send` per run and waits 2 seconds between Twilio sends to reduce risk of blocks.
+- **Rate limiting** – With WhatsApp Web the script waits ~15 seconds between contacts. With Twilio it waits 2 seconds. Keep `--max-send` modest to reduce block risk.
 - **Data** – You are responsible for handling personal data (phone numbers, names) in line with GDPR and local privacy laws.
 
 ## Troubleshooting: "Found 0 new phone contacts"

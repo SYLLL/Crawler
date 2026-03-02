@@ -7,7 +7,7 @@ from pathlib import Path
 from config import LEADS_CSV, SENT_CSV, TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_FROM, DATA_DIR
 from crawler import Lead
 
-OUTREACH_TEMPLATE = """Hi [Name], I'm Katie, a Stanford grad running a research project on professional cleaning. We're looking for cleaning companies to partner with. Your cleaners wear a small body camera during their normal work and we capture the process. They get paid extra per session, your company gets a location fee and a free professional video of your team's work. All equipment and waivers handled by us. Would you be open to a quick call?"""
+OUTREACH_TEMPLATE = """Hi [Name], I'm Lia, a Stanford grad running a research project on professional cleaning. We're looking for cleaning companies to partner with. Your cleaners wear a small body camera during their normal work and we capture the process. They get paid extra per session, your company gets a location fee and a free professional video of your team's work. All equipment and waivers handled by us. Would you be open to a quick call?"""
 
 
 def format_message(lead: Lead) -> str:
@@ -92,11 +92,13 @@ def send_whatsapp(lead: Lead) -> bool:
         if not to.startswith("+"):
             to = "+" + to
         body = format_message(lead)
-        client.messages.create(
+        msg = client.messages.create(
             from_=TWILIO_WHATSAPP_FROM,
             to=f"whatsapp:{to}",
             body=body,
         )
+        if msg.status == "failed" or getattr(msg, "error_code", None):
+            print(f"Twilio: message to {to} may have failed (status={msg.status}, error_code={getattr(msg, 'error_code', '')}). Check Twilio Console → Messaging → Logs.")
         return True
     except Exception as e:
         print(f"Twilio send error for {lead.phone}: {e}")

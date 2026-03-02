@@ -25,7 +25,10 @@ SEARCH_QUERIES = [
 # DuckDuckGo region: id-id (Indonesia), th-th (Thailand), sg-en (Singapore), wt-wt (no region)
 SEARCH_REGION = os.getenv("SEARCH_REGION", "wt-wt")
 
-# Twilio WhatsApp (optional)
+# How to send WhatsApp: "twilio" (API) or "whatsapp_web" (your number via browser)
+SEND_METHOD = os.getenv("SEND_METHOD", "whatsapp_web").strip().lower() or "whatsapp_web"
+
+# Twilio WhatsApp (optional; used when SEND_METHOD=twilio)
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "")
 TWILIO_WHATSAPP_FROM = os.getenv("TWILIO_WHATSAPP_FROM", "whatsapp:+14155238886")
